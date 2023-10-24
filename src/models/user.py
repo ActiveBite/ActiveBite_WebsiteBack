@@ -1,4 +1,4 @@
-from sqlalchemy import String
+from sqlalchemy import String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from models.base import Base
@@ -6,6 +6,7 @@ from models.base import Base
 
 class User(Base):
     __tablename__ = "users"
+    __table_args__ = (UniqueConstraint('username', 'email'),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(50))
@@ -13,4 +14,5 @@ class User(Base):
     password: Mapped[str] = mapped_column(String(255))
 
     def __repr__(self) -> str:
-        return f"User(id={self.id}, username={self.username}, email={self.email}, password={self.password})"
+        return f'''User(id={self.id}, username={self.username}, email={self.email},
+        password={self.password})'''
