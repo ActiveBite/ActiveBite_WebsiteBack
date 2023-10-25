@@ -3,12 +3,12 @@ from typing import TypedDict
 from flask import Blueprint, request
 
 from models.base import Session
-from services.auth_service import Auth
+from services.auth_service import AuthService
 from utils.validate_email import validate_email
 
 auth = Blueprint('auth', __name__)
 
-auth_service = Auth()
+auth_service = AuthService()
 
 
 class RegData(TypedDict):
