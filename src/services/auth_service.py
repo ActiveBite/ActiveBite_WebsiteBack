@@ -2,7 +2,7 @@
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import select
 from passlib.hash import bcrypt
-from models.user import User
+from models.models import User
 
 
 class AuthService:
