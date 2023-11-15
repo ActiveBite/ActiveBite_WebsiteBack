@@ -13,9 +13,9 @@ class AuthService:
             statement = select(User).where(User.username == username)
             candidate = session.execute(statement).scalar_one_or_none()
             if not candidate:
-                raise ValueError('Not found')
+                raise ValueError('Пользователь не найден')
             if not bcrypt.verify(password, candidate.password):
-                raise ValueError('Wrong password')
+                raise ValueError('Неправильный пароль')
             return 'ok'
 
     def registration(
@@ -25,7 +25,7 @@ class AuthService:
             statement = select(User).where(User.username == username)
             candidate = session.execute(statement).scalar_one_or_none()
             if candidate:
-                raise ValueError('Already exist')
+                raise ValueError('Пользователь уже существует')
             user = User(username=username, password=bcrypt.hash(password), email=email)
             session.add(user)
             session.commit()

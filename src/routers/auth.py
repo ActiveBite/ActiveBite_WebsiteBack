@@ -1,3 +1,4 @@
+from flask_cors import cross_origin
 from sqlalchemy.exc import IntegrityError
 from typing import TypedDict
 from flask import Blueprint, request
@@ -6,7 +7,7 @@ from models.base import Session
 from services.auth_service import AuthService
 from utils.validate_email import validate_email
 
-auth = Blueprint('auth', __name__)
+auth = Blueprint('auth', __name__, url_prefix='/auth')
 
 auth_service = AuthService()
 
@@ -21,6 +22,7 @@ class RegData(AuthData):
 
 
 @auth.route('/authorization', methods=["POST"])
+@cross_origin()
 def authorization():
     try:
         user_data: AuthData = request.get_json()
@@ -30,16 +32,14 @@ def authorization():
             password=user_data['password'],
         )
         return '', 200
-    except IntegrityError:
-        return 'User already exist', 400
     except ValueError as e:
-        print(e)
         return str(e), 400
     except KeyError:
-        return 'Required params is empty', 400
+        return 'Обязательные параметры пустые', 400
 
 
 @auth.route('/registration', methods=["POST"])
+@cross_origin()
 def registration():
     try:
         # session = Session()
@@ -52,10 +52,7 @@ def registration():
             password=user_data['password'],
         )
         return '', 200
-    except IntegrityError:
-        return 'User already exist', 400
     except ValueError as e:
-        print(e)
         return str(e), 400
     except KeyError:
-        return 'Required params is empty', 400
+        return 'Обязательные параметры пустые', 400
