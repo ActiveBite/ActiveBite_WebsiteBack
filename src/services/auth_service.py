@@ -1,4 +1,4 @@
-# from src.models.base import Session
+from flask_jwt_extended import create_access_token, create_refresh_token
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import select
 from passlib.hash import bcrypt
@@ -16,7 +16,13 @@ class AuthService:
                 raise ValueError('Пользователь не найден')
             if not bcrypt.verify(password, candidate.password):
                 raise ValueError('Неправильный пароль')
-            return 'ok'
+            access_token = create_access_token(
+                identity=[candidate.username, candidate.id]
+            )
+            refresh_token = create_refresh_token(
+                identity=[candidate.username, candidate.id]
+            )
+            return access_token, refresh_token
 
     def registration(
         self, Session: sessionmaker[Session], username: str, email: str, password: str

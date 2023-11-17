@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+from typing import List
 from sqlalchemy import (
     CheckConstraint,
     Column,
@@ -8,9 +10,42 @@ from sqlalchemy import (
     Integer,
     Text,
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.base import Base
+
+
+def as_dict(model: Base):
+    return {
+        column.name: getattr(model, column.name) for column in model.__table__.columns
+    }
+
+
+def as_list_of_dicts(result):
+    return [as_dict(row) for row in result]
+
+
+@dataclass
+class Training(Base):
+    __tablename__ = "trainings"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(Text())
+    description: Mapped[str] = mapped_column(String(50))
+    image: Mapped[str] = mapped_column(String(255), nullable=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=True)
+
+    def __repr__(self) -> str:
+        return f'''Training(id={self.id}, title={self.title},
+        description={self.description}, image={self.image}), user_id={self.user_id})'''
+
+
+favorite_training = Table(
+    'favorite_trainings',
+    Base.metadata,
+    Column('training_id', ForeignKey('trainings.id')),
+    Column('user_id', ForeignKey('users.id')),
+)
 
 
 class User(Base):
@@ -21,21 +56,12 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(50))
     email: Mapped[str] = mapped_column(String(50))
     password: Mapped[str] = mapped_column(String(255))
-    avatar: Mapped[str] = mapped_column(String(255))
+    avatar: Mapped[str] = mapped_column(String(255), nullable=True)
+    favorites: Mapped[List[Training]] = relationship(secondary=favorite_training)
 
     def __repr__(self) -> str:
         return f'''User(id={self.id}, username={self.username}, email={self.email},
         password={self.password})'''
-
-
-class Train(Base):
-    __tablename__ = "trains"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(Text())
-    description: Mapped[str] = mapped_column(String(50))
-    image: Mapped[str] = mapped_column(String(255))
-    duration: Mapped[int] = mapped_column(Integer)
 
 
 class Exercise(Base):
@@ -46,13 +72,13 @@ class Exercise(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     exercise_name: Mapped[str] = mapped_column(String(255))
-    difficulty: Mapped[int] = mapped_column(Integer)
+    difficulty: Mapped[int] = mapped_column()
 
 
-train_exercises = Table(
-    "train_exercises",
+traininig_exercise = Table(
+    'training_exercises',
     Base.metadata,
-    Column("train_id", ForeignKey("trains.id")),
-    Column("exercise_id", ForeignKey("exercises.id")),
+    Column('training_id', ForeignKey('trainings.id')),
+    Column('exercise_id', ForeignKey('exercises.id')),
     Column("exercise_duration ", Integer),
 )

@@ -16,3 +16,7 @@ class UserService:
             )
             user = session.execute(statement)
             return user
+
+    def add_favorite_training(self, Session: sessionmaker[Session], user_id: int):
+        with Session() as session:
+            pass

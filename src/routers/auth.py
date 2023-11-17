@@ -1,5 +1,4 @@
 from flask_cors import cross_origin
-from sqlalchemy.exc import IntegrityError
 from typing import TypedDict
 from flask import Blueprint, request
 
@@ -42,7 +41,6 @@ def authorization():
 @cross_origin()
 def registration():
     try:
-        # session = Session()
         user_data: RegData = request.get_json()
         validate_email(user_data['email'])
         auth_service.registration(
