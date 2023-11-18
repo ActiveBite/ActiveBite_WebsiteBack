@@ -1,7 +1,7 @@
-from sqlalchemy import insert
+# from sqlalchemy import insert
 from models.base import Base, engine, Session
 from services.auth_service import AuthService
-from models.models import Training, User, favorite_training
+from models.models import Training, favorite_training
 
 
 def create_tables():

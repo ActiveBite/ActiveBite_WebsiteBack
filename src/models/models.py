@@ -48,6 +48,7 @@ favorite_training = Table(
 )
 
 
+@dataclass
 class User(Base):
     __tablename__ = "users"
     __table_args__ = (UniqueConstraint('username', 'email'),)
@@ -64,6 +65,7 @@ class User(Base):
         password={self.password})'''
 
 
+@dataclass
 class Exercise(Base):
     __tablename__ = "exercises"
     __table_args__ = (
@@ -75,10 +77,10 @@ class Exercise(Base):
     difficulty: Mapped[int] = mapped_column()
 
 
-traininig_exercise = Table(
+training_exercise = Table(
     'training_exercises',
     Base.metadata,
     Column('training_id', ForeignKey('trainings.id')),
     Column('exercise_id', ForeignKey('exercises.id')),
-    Column("exercise_duration ", Integer),
+    Column("duration", Integer),
 )

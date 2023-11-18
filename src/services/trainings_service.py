@@ -1,7 +1,13 @@
 from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy import select
+from sqlalchemy import insert, select
 
-from models.models import Training, as_list_of_dicts, favorite_training
+from models.models import (
+    Exercise,
+    Training,
+    as_list_of_dicts,
+    favorite_training,
+    training_exercise,
+)
 
 
 class TrainingsService:
@@ -26,14 +32,35 @@ class TrainingsService:
                 )
             else:
                 statement = select(Training)
-            # 'select * from trainings inner join training_exercise on
-            # trainings.id = training_exercise.training_id inner
-            # join users on training_exercise.user_id where users.user_id = 1'
-            res = session.execute(statement).all()[0]
-            return as_list_of_dicts(res)
+            res = session.execute(statement).all()
+            if not res:
+                return []
+            return as_list_of_dicts(res[0])
 
-    def set_training(self):
-        pass
+    def set_training(
+        self,
+        Session: sessionmaker[Session],
+        title: str,
+        description: str,
+        exercises: list[dict[str, int]],
+        img: str | None = None,
+        user_id: int | None = None,
+    ):
+        with Session() as session:
+            new_training = Training(
+                title=title, description=description, image=img, user_id=user_id
+            )
+            session.add(new_training)
+            session.flush()
+            for exercise in exercises:
+                exercise['training_id'] = new_training.id
+            insert_exercises = insert(training_exercise).values(exercises)
+            print(new_training.id)
+            session.execute(insert_exercises)
+            session.commit()
+
+    def set_exercise(self, exercise_name, difficulty):
+        new_exercise = Exercise(exercise_name=exercise_name, difficulty=difficulty)
 
     def delete_training(self):
         pass
