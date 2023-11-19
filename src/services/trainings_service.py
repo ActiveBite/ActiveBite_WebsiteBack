@@ -59,8 +59,11 @@ class TrainingsService:
             session.execute(insert_exercises)
             session.commit()
 
-    def set_exercise(self, exercise_name, difficulty):
-        new_exercise = Exercise(exercise_name=exercise_name, difficulty=difficulty)
+    def set_exercise(self, Session: sessionmaker[Session], exercise_name, difficulty):
+        with Session() as session:
+            new_exercise = Exercise(exercise_name=exercise_name, difficulty=difficulty)
+            session.add(new_exercise)
+            session.commit()
 
     def delete_training(self):
         pass

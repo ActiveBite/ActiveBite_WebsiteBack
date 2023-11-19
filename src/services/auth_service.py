@@ -22,7 +22,13 @@ class AuthService:
             refresh_token = create_refresh_token(
                 identity=[candidate.username, candidate.id]
             )
-            return access_token, refresh_token
+            info = {
+                'username': candidate.username,
+                'avatar': candidate.avatar,
+                'access_token': access_token,
+                'refresh_token': refresh_token,
+            }
+            return info
 
     def registration(
         self, Session: sessionmaker[Session], username: str, email: str, password: str

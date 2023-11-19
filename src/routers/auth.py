@@ -1,6 +1,6 @@
 from flask_cors import cross_origin
 from typing import TypedDict
-from flask import Blueprint, request
+from flask import Blueprint, Response, make_response, request
 
 from models.base import Session
 from services.auth_service import AuthService
@@ -25,12 +25,15 @@ class RegData(AuthData):
 def authorization():
     try:
         user_data: AuthData = request.get_json()
-        auth_service.authorization(
+        info = auth_service.authorization(
             Session=Session,
             username=user_data['username'],
             password=user_data['password'],
         )
-        return '', 200
+        response = make_response(info)
+        response.set_cookie("access_token", value=info.pop('access_token'))
+        response.set_cookie("refresh_token", value=info.pop('refresh_token'))
+        return response, 200
     except ValueError as e:
         return str(e), 400
     except KeyError:
