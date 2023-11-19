@@ -1,6 +1,6 @@
 from flask_cors import cross_origin
 from typing import TypedDict
-from flask import Blueprint, Response, make_response, request
+from flask import Blueprint, make_response, request
 
 from models.base import Session
 from services.auth_service import AuthService
@@ -30,9 +30,11 @@ def authorization():
             username=user_data['username'],
             password=user_data['password'],
         )
+        access_token = info.pop('access_token')
+        refresh_token = info.pop('refresh_token')
         response = make_response(info)
-        response.set_cookie("access_token", value=info.pop('access_token'))
-        response.set_cookie("refresh_token", value=info.pop('refresh_token'))
+        response.set_cookie("access_token", value=access_token)
+        response.set_cookie("refresh_token", value=refresh_token)
         return response, 200
     except ValueError as e:
         return str(e), 400
