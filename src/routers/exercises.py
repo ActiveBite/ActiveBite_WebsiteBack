@@ -1,14 +1,20 @@
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy import insert, select
+from flask import Blueprint, request
+from flask_cors import cross_origin
+from flask_jwt_extended import jwt_required
+from models.base import Session
+from services.exercises_service import ExercisesService
 
-from models.models import Exercise
+
+exercises = Blueprint('exercises', __name__, url_prefix='/exercises')
+
+exercises_service = ExercisesService()
 
 
-class ExercisesService:
-    def get_exercises(self, Session: sessionmaker[Session], search_query: str = None):
-        with Session() as session:
-            statement = select(Exercise)
-            if search_query:
-                statement.where(Exercise.exercise_name.like(f'%{search_query}%'))
-            exercises = session.execute(statement.limit(5)).all()
-            return exercises[0] if exercises else []
+@exercises.route('/', methods=["get"])
+@jwt_required
+def get_exercises():
+    search_query = request.get_json('search_query')
+    exercises = exercises_service.get_exercises(
+        Session=Session, search_query=search_query
+    )
+    return exercises
