@@ -1,7 +1,6 @@
 from flask_cors import cross_origin
-from sqlalchemy.exc import IntegrityError
 from typing import TypedDict
-from flask import Blueprint, request
+from flask import Blueprint, make_response, request
 
 from models.base import Session
 from services.auth_service import AuthService
@@ -26,12 +25,17 @@ class RegData(AuthData):
 def authorization():
     try:
         user_data: AuthData = request.get_json()
-        auth_service.authorization(
+        info = auth_service.authorization(
             Session=Session,
             username=user_data['username'],
             password=user_data['password'],
         )
-        return '', 200
+        access_token = info.pop('access_token')
+        refresh_token = info.pop('refresh_token')
+        response = make_response(info)
+        response.set_cookie("access_token", value=access_token)
+        response.set_cookie("refresh_token", value=refresh_token)
+        return response, 200
     except ValueError as e:
         return str(e), 400
     except KeyError:
@@ -42,7 +46,6 @@ def authorization():
 @cross_origin()
 def registration():
     try:
-        # session = Session()
         user_data: RegData = request.get_json()
         validate_email(user_data['email'])
         auth_service.registration(
