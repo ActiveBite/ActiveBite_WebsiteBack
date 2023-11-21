@@ -19,4 +19,4 @@ cors = CORS(app, origins="*")
 if __name__ == '__main__':
     drop_tables()
     create_tables()
-    app.run(debug=True, port=3000)
+    app.run(debug=True, port=3030)
