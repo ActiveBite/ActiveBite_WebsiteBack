@@ -22,7 +22,7 @@ def as_dict(model: Base):
 
 
 def as_list_of_dicts(result):
-    return [as_dict(row) for row in result]
+    return [as_dict(row[0]) for row in result]
 
 
 @dataclass

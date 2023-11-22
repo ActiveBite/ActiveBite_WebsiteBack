@@ -2,6 +2,7 @@
 from models.base import Base, engine, Session
 from services.auth_service import AuthService
 from models.models import Training, favorite_training
+from services.exercises_service import ExercisesService
 
 
 def create_tables():
@@ -10,7 +11,26 @@ def create_tables():
     auth.registration(
         Session=Session, username='tipask', password='123457', email='tttt@ya.ru'
     )
-    # print(auth.authorization(Session=Session, username='tipask', password='123457'))
+    exercise_service = ExercisesService()
+    exercises = [{
+        'name': 'Становая тяга',
+        'difficulty': 3
+    },{
+        'name': 'Скручивания на пресс',
+        'difficulty': 1
+    },{
+        'name': 'Румынская тяга',
+        'difficulty': 3
+    },{
+        'name': 'Выпады со штангой',
+        'difficulty': 2
+    },{
+        'name': 'Подтягивания на перекладине',
+        'difficulty': 1
+    }]
+    for exercise in exercises:
+        exercise_service.set_exercise(Session=Session, exercise_name=exercise['name'],
+                                      difficulty=exercise['difficulty'])
     training = Training(title='training', description='asdadadads')
     with Session() as session:
         session.add(training)

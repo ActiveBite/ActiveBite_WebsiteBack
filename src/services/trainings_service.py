@@ -35,7 +35,7 @@ class TrainingsService:
             res = session.execute(statement).all()
             if not res:
                 return []
-            return as_list_of_dicts(res[0])
+            return as_list_of_dicts(res)
 
     def set_training(
         self,
