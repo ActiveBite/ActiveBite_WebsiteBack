@@ -1,5 +1,4 @@
-from flask import Blueprint, request, Response
-from flask_cors import cross_origin
+from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from services.trainings_service import TrainingsService
 from models.base import Session
@@ -34,6 +33,10 @@ def get_trainings():
 
 
 @trainings.route('/training', methods=["get"])
-@cross_origin()
+@jwt_required()
 def get_training_by_id():
-    return 'ok', 200
+    training_id = request.args.get('training_id')
+    if not training_id:
+        return 'training_id - обязательный параметр', 400
+    training = trainings_service.get_training_by_id(Session=Session, training_id=training_id)
+    return training, 200

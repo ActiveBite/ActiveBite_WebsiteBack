@@ -4,6 +4,7 @@ from sqlalchemy import insert, select
 from models.models import (
     Exercise,
     Training,
+    as_dict,
     as_list_of_dicts,
     favorite_training,
     training_exercise,
@@ -36,6 +37,17 @@ class TrainingsService:
             if not res:
                 return []
             return as_list_of_dicts(res)
+
+    def get_training_by_id(self, Session: sessionmaker[Session], training_id: int):
+        with Session() as session:
+            select_training = select(Training).where(Training.id == training_id)
+            select_exercises = select(Exercise).join(training_exercise,
+                                                     onclause=Exercise.id == training_exercise.c.exercise_id).where(training_exercise.c.training_id == training_id)
+            training = session.execute(select_training).scalar()
+            exercises = session.execute(select_exercises).all()
+            training_dict = as_dict(training)
+            exercise_list = as_list_of_dicts(exercises)
+            return {'training': training_dict, 'exercises': exercise_list} if training else {}
 
     def set_training(
         self,
