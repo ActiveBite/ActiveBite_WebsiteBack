@@ -8,8 +8,9 @@ class ExercisesService:
     def get_exercises(self, Session: sessionmaker[Session], search_query: str = None):
         with Session() as session:
             statement = select(Exercise)
+            print(search_query)
             if search_query:
-                statement.where(Exercise.exercise_name.like(f'%{search_query}%')).limit(
+                statement = statement.where(Exercise.exercise_name.like(f'%{search_query}%')).limit(
                     4
                 )
             exercises = session.execute(statement).all()

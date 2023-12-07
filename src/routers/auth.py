@@ -1,4 +1,3 @@
-from flask_cors import cross_origin
 from typing import TypedDict
 from flask import Blueprint, make_response, request
 

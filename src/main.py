@@ -19,7 +19,7 @@ CORS(app, origins=['https://bug-free-space-disco-q4gxww45xrvc6ww5-3000.app.githu
 app.register_blueprint(auth)
 app.register_blueprint(trainings)
 app.register_blueprint(exercises)
-# app.config['CORS_HEADERS'] = 'Content-Type'
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 
 if __name__ == '__main__':
