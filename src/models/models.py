@@ -84,3 +84,17 @@ training_exercise = Table(
     Column('exercise_id', ForeignKey('exercises.id')),
     Column("duration", Integer),
 )
+
+training_likes = Table(
+    'training_likes',
+    Base.metadata,
+    Column('training_id', ForeignKey('trainings.id')),
+    Column('user_id', ForeignKey('users.id')),
+)
+
+training_dislikes = Table(
+    'training_dislikes',
+    Base.metadata,
+    Column('training_id', ForeignKey('trainings.id')),
+    Column('user_id', ForeignKey('users.id')),
+)

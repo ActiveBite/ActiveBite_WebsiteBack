@@ -13,7 +13,6 @@ exercises_service = ExercisesService()
 @jwt_required()
 def get_exercises():
     search_query = request.args.get('search_query')
-    print(123124)
     exercises = exercises_service.get_exercises(
         Session=Session, search_query=search_query
     )

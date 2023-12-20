@@ -11,7 +11,7 @@ trainings_service = TrainingsService()
 
 @trainings.route('/', methods=['get', 'post'])
 @jwt_required()
-def get_trainings():
+def get_set_trainings():
     # query params
     # published=true, favorite=true, user_id from jwt
     if request.method == 'GET':
@@ -36,7 +36,19 @@ def get_trainings():
 @jwt_required()
 def get_training_by_id():
     training_id = request.args.get('training_id')
+    user_id = get_jwt_identity()[1]
     if not training_id:
         return 'training_id - обязательный параметр', 400
-    training = trainings_service.get_training_by_id(Session=Session, training_id=training_id)
+    training = trainings_service.get_training_by_id(Session=Session, training_id=training_id, user_id=user_id)
     return training, 200
+
+
+@trainings.route('/training/rate', methods=["post"])
+@jwt_required()
+def rate_training():
+    rate_info = request.get_json()
+    user_id = get_jwt_identity()[1]
+    trainings_service.rate_training(
+        Session=Session, training_id=rate_info['training_id'], rate=rate_info['rate'], user_id=user_id
+    )
+    return 'rated', 200
