@@ -37,6 +37,7 @@ class TrainingsService:
             else:
                 statement = select(Training)
             res = session.execute(statement).all()
+            print(res)
             if not res:
                 return []
             return as_list_of_dicts(res)
@@ -44,9 +45,10 @@ class TrainingsService:
     def get_training_by_id(self, Session: sessionmaker[Session], training_id: int, user_id: int):
         with Session() as session:
             select_training = select(Training).where(Training.id == training_id)
-            select_exercises = select(Exercise).join(
+            select_exercises = select(Exercise.id, Exercise.exercise_name, training_exercise.c.duration).join(
                 training_exercise, onclause=Exercise.id == training_exercise.c.exercise_id
             ).where(training_exercise.c.training_id == training_id)
+            print(select_exercises)
 
             training = session.execute(select_training).scalar()
             exercises = session.execute(select_exercises).all()
@@ -60,16 +62,29 @@ class TrainingsService:
                     and_(training_dislikes.c.training_id == training_id, training_dislikes.c.user_id == user_id)
                 )
             ).one_or_none()
+            favorite = session.execute(
+                favorite_training.select().where(
+                    and_(favorite_training.c.training_id == training_id, favorite_training.c.user_id == user_id)
+                )
+            ).one_or_none()
+
+            if not training:
+                return {}
 
             training_dict = as_dict(training)
-            exercise_list = as_list_of_dicts(exercises)
+            exercise_list = [
+                {'id': exercise[0],
+                 'exercise_name': exercise[1],
+                 'duration': exercise[2]
+                } for exercise in exercises
+            ]
 
             training_info = {
                 'training': training_dict,
                 'exercises': exercise_list,
                 'like': bool(liked),
                 'dislike': bool(disliked),
-                'favorite': False
+                'favorite': bool(favorite)
             } if training else {}
             print(training_info)
             return training_info
@@ -92,7 +107,6 @@ class TrainingsService:
             for exercise in exercises:
                 exercise['training_id'] = new_training.id
             insert_exercises = insert(training_exercise).values(exercises)
-            print(new_training.id)
             session.execute(insert_exercises)
             session.commit()
 
@@ -132,15 +146,20 @@ class TrainingsService:
                 favorite_training.select().where(
                     and_(favorite_training.c.training_id == training_id, favorite_training.c.user_id == user_id)
                 )
-            )
+            ).one_or_none()
+            print(is_training_exists)
+            print(session.execute(favorite_training.select()).all())
             if is_training_exists:
+                print(training_id, user_id)
                 session.execute(
                     favorite_training.delete().where(
                         and_(favorite_training.c.training_id == training_id, favorite_training.c.user_id == user_id)
                     )
                 )
             else:
-                session.execute(favorite_training.insert().values(training_id, user_id))
+                session.execute(favorite_training.insert().values(training_id=training_id, user_id=user_id))
+
+            session.commit()
 
     def delete_training(self):
         pass

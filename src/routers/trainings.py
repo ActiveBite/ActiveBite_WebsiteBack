@@ -52,3 +52,14 @@ def rate_training():
         Session=Session, training_id=rate_info['training_id'], rate=rate_info['rate'], user_id=user_id
     )
     return 'rated', 200
+
+
+@trainings.route('/training/add_to_favorite', methods=["post"])
+@jwt_required()
+def add_to_favorite():
+    training_id = request.get_json()['training_id']
+    user_id = get_jwt_identity()[1]
+    trainings_service.add_to_favorite(
+        Session=Session, training_id=training_id, user_id=user_id
+    )
+    return 'added', 200

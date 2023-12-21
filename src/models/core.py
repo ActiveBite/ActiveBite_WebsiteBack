@@ -3,6 +3,7 @@ from models.base import Base, engine, Session
 from services.auth_service import AuthService
 from models.models import Training, favorite_training
 from services.exercises_service import ExercisesService
+from services.trainings_service import TrainingsService
 
 
 def create_tables():
@@ -31,12 +32,13 @@ def create_tables():
     for exercise in exercises:
         exercise_service.set_exercise(Session=Session, exercise_name=exercise['name'],
                                       difficulty=exercise['difficulty'])
-    training = Training(title='training', description='asdadadads')
-    with Session() as session:
-        session.add(training)
-        # stmnt = insert(favourite_training).values(training)
-        session.execute(favorite_training.insert().values(training_id=1, user_id=1))
-        session.commit()
+    trainings_service = TrainingsService()
+    trainings_service.set_training(
+        Session=Session,
+        title='Тест тренировка',
+        description='Тест описание тест описание тест описание тест описание тест описание тест описание',
+        exercises=[{'exercise_id': 1, 'duration': 5}, {'exercise_id': 1, 'duration': 15}],
+    )
 
 
 def drop_tables():

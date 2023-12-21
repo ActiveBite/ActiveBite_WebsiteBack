@@ -16,6 +16,7 @@ app.config["JWT_COOKIE_CSRF_PROTECT"] = False
 jwt = JWTManager(app)
 CORS(app, origins=['https://bug-free-space-disco-q4gxww45xrvc6ww5-3000.app.github.dev',
                    'https://friendly-pancake-qjq9j64xg7w397pq-3000.app.github.dev',
+                   'https://vigilant-potato-9gxj76vrwwx24rx-3000.app.github.dev',
                    'http://localhost:3000', 'http://127.0.0.1:3000'], supports_credentials=True, )
 app.register_blueprint(auth)
 app.register_blueprint(trainings)
