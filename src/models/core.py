@@ -2,6 +2,8 @@
 from models.base import Base, engine, Session
 from services.auth_service import AuthService
 from models.models import Training, favorite_training
+from services.exercises_service import ExercisesService
+from services.trainings_service import TrainingsService
 
 
 def create_tables():
@@ -10,13 +12,33 @@ def create_tables():
     auth.registration(
         Session=Session, username='tipask', password='123457', email='tttt@ya.ru'
     )
-    # print(auth.authorization(Session=Session, username='tipask', password='123457'))
-    training = Training(title='training', description='asdadadads')
-    with Session() as session:
-        session.add(training)
-        # stmnt = insert(favourite_training).values(training)
-        session.execute(favorite_training.insert().values(training_id=1, user_id=1))
-        session.commit()
+    exercise_service = ExercisesService()
+    exercises = [{
+        'name': 'Становая тяга',
+        'difficulty': 3
+    },{
+        'name': 'Скручивания на пресс',
+        'difficulty': 1
+    },{
+        'name': 'Румынская тяга',
+        'difficulty': 3
+    },{
+        'name': 'Выпады со штангой',
+        'difficulty': 2
+    },{
+        'name': 'Подтягивания на перекладине',
+        'difficulty': 1
+    }]
+    for exercise in exercises:
+        exercise_service.set_exercise(Session=Session, exercise_name=exercise['name'],
+                                      difficulty=exercise['difficulty'])
+    trainings_service = TrainingsService()
+    trainings_service.set_training(
+        Session=Session,
+        title='Тест тренировка',
+        description='Тест описание тест описание тест описание тест описание тест описание тест описание',
+        exercises=[{'exercise_id': 1, 'duration': 5}, {'exercise_id': 1, 'duration': 15}],
+    )
 
 
 def drop_tables():

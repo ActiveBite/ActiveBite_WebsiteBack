@@ -1,4 +1,3 @@
-from flask_cors import cross_origin
 from typing import TypedDict
 from flask import Blueprint, make_response, request
 
@@ -21,7 +20,6 @@ class RegData(AuthData):
 
 
 @auth.route('/authorization', methods=["POST"])
-@cross_origin()
 def authorization():
     try:
         user_data: AuthData = request.get_json()
@@ -33,8 +31,10 @@ def authorization():
         access_token = info.pop('access_token')
         refresh_token = info.pop('refresh_token')
         response = make_response(info)
-        response.set_cookie("access_token", value=access_token)
-        response.set_cookie("refresh_token", value=refresh_token)
+        response.set_cookie("access_token_cookie", value=access_token, samesite='none',
+                            max_age=86400, httponly=True, secure=True)
+        response.set_cookie("refresh_token_cookie", value=refresh_token, samesite='none',
+                            max_age=86400, httponly=True, secure=True)
         return response, 200
     except ValueError as e:
         return str(e), 400
@@ -43,7 +43,6 @@ def authorization():
 
 
 @auth.route('/registration', methods=["POST"])
-@cross_origin()
 def registration():
     try:
         user_data: RegData = request.get_json()

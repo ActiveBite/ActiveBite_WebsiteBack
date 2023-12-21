@@ -22,7 +22,7 @@ def as_dict(model: Base):
 
 
 def as_list_of_dicts(result):
-    return [as_dict(row) for row in result]
+    return [as_dict(row[0]) for row in result]
 
 
 @dataclass
@@ -83,4 +83,18 @@ training_exercise = Table(
     Column('training_id', ForeignKey('trainings.id')),
     Column('exercise_id', ForeignKey('exercises.id')),
     Column("duration", Integer),
+)
+
+training_likes = Table(
+    'training_likes',
+    Base.metadata,
+    Column('training_id', ForeignKey('trainings.id')),
+    Column('user_id', ForeignKey('users.id')),
+)
+
+training_dislikes = Table(
+    'training_dislikes',
+    Base.metadata,
+    Column('training_id', ForeignKey('trainings.id')),
+    Column('user_id', ForeignKey('users.id')),
 )
